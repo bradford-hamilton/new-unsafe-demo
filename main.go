@@ -42,6 +42,10 @@ func main() {
 	for i := 0; i < len(fruits); i++ {
 		p(*(*string)(unsafe.Add(start, uintptr(i)*size)))
 	}
+	// apples
+	// oranges
+	// bananas
+	// kansas
 }
 
 func p(a any) { fmt.Printf("%+v\n", a) }
