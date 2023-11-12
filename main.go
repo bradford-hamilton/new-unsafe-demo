@@ -25,8 +25,9 @@ func main() {
 
 	u.animals = []string{"missy", "ellie", "toby"}
 	secondAnimal := (*string)(unsafe.Add(
-		unsafe.Pointer(unsafe.SliceData(u.animals)), unsafe.Sizeof("")),
-	)
+		unsafe.Pointer(unsafe.SliceData(u.animals)),
+		unsafe.Sizeof(""),
+	))
 	p(u) // {name:bradford age:34 animals:[missy ellie toby]}
 
 	*secondAnimal = "carlos"
