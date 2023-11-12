@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"unsafe"
+
+	"github.com/bradford-hamilton/new-unsafe-demo/internal/priv"
 )
 
 type user struct {
@@ -46,6 +48,34 @@ func main() {
 	// oranges
 	// bananas
 	// kansas
+
+	// ------------------------------------------------
+	ps := priv.NewStruct()
+	p(ps) // {foo:bar bar:1337 baz:[100 150 200 250]}
+
+	foo := (*string)(unsafe.Pointer(&ps))
+	*foo = "bradford"
+	p(ps) // {foo:bradford bar:1337 baz:[100 150 200 250]}
+
+	bar := (*int)(unsafe.Add(unsafe.Pointer(&ps), unsafe.Sizeof("")))
+	*bar = 20
+	p(ps) // {foo:bradford bar:20 baz:[100 150 200 250]}
+
+	slcPtr := (*[]int)(unsafe.Add(
+		unsafe.Pointer(&ps), (unsafe.Sizeof("") + unsafe.Sizeof(int(0))),
+	))
+	p(*slcPtr) // [100 150 200 250]
+
+	start = unsafe.Pointer(unsafe.SliceData(*slcPtr))
+	size = unsafe.Sizeof(int(0))
+
+	for i := 0; i < len(*slcPtr); i++ {
+		p(*(*int)(unsafe.Add(start, uintptr(i)*size)))
+	}
+	// 100
+	// 150
+	// 200
+	// 250
 }
 
 func p(a any) { fmt.Printf("%+v\n", a) }
