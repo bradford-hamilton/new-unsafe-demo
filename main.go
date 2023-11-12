@@ -35,10 +35,11 @@ func main() {
 
 	// ------------------------------------------------
 
-	mySlice := []string{"apples", "oranges", "bananas", "kansas"}
-	start := unsafe.Pointer(unsafe.SliceData(mySlice))
-	size := unsafe.Sizeof(mySlice[0])
-	for i := 0; i < len(mySlice); i++ {
+	fruits := []string{"apples", "oranges", "bananas", "kansas"}
+	start := unsafe.Pointer(unsafe.SliceData(fruits))
+	size := unsafe.Sizeof(fruits[0])
+
+	for i := 0; i < len(fruits); i++ {
 		p(*(*string)(unsafe.Add(start, uintptr(i)*size)))
 	}
 }
