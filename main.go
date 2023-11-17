@@ -16,18 +16,47 @@ type user struct {
 }
 
 func main() {
+	// Declare zero value 'user' struct and print its contents:
 	var u user
 	p(u) // {name: age:0 animals:[]}
 
+	// Retrieve an unsafe.Pointer to 'u', which points to the first
+	// member of the struct - 'name' - which is a string. Then we
+	// cast the unsafe.Pointer to a string pointer. This allows us
+	// to manipulate the memory pointed at as a string type.
 	uNamePtr := (*string)(unsafe.Pointer(&u))
 	*uNamePtr = "bradford"
 	p(u) // {name:bradford age:0 animals:[]}
 
+	// Here we have a similar situation in that we want to get a pointer
+	// to a struct member. This time it is the second member, so we need
+	// to calculate the address within the struct by using offsets. The
+	// general idea is that we need to add the size of 'name' to the
+	// address of the struct to get to the start of the 'age' member.
+	// Finally we cast it to an '*int' - so we get an unsafe.Pointer
+	// from 'unsafe.Add' and cast it to an '*int'.
 	age := (*int)(unsafe.Add(unsafe.Pointer(&u), unsafe.Offsetof(u.age)))
 	*age = 34
 	p(u) // {name:bradford age:34 animals:[]}
 
+	// Note: this can be applied to private structs/struct members,
+	// however there are some implementation differences. For example,
+	// when getting a pointer to the 'age' member, we wouldn't have
+	// access to 'u.age'. Instead, we could use unsafe.Sizeof("") to
+	// get the size of a string (the first member) and add that to the
+	// base 'u' unsafe.Pointer.
+
+	// Here we are working with something a bit different. First we add
+	// a slice of animals to the user struct we've been working with.
 	u.animals = []string{"missy", "ellie", "toby"}
+
+	// Now we want to get a pointer to the second slice element and make
+	// a change to it. We use a new unsafe func here called 'SliceData'.
+	// This will return a pointer to the underlying array of the argument
+	// slice. Now that we have a pointer to the array, we can add the size
+	// of one string to the pointer to get the address of the second element.
+	// This means you could say 2*unsafe.Sizeof("") to get to the third
+	// element in this example if that is helpful at all.
 	secondAnimal := (*string)(unsafe.Add(
 		unsafe.Pointer(unsafe.SliceData(u.animals)), unsafe.Sizeof(""),
 	))
@@ -36,12 +65,27 @@ func main() {
 	*secondAnimal = "carlos"
 	p(u) // {name:bradford age:34 animals:[missy carlos toby]}
 
-	// ------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	fruits := []string{"apples", "oranges", "bananas", "kansas"}
+
+	// Get an unsafe.Pointer to the slice data
 	start := unsafe.Pointer(unsafe.SliceData(fruits))
+
+	// Get the size of an item in the slice. This could also be
+	// written as 'size := unsafe.Sizeof("")' here.
 	size := unsafe.Sizeof(fruits[0])
 
+	// Here we loop over the slice and print the data in each item.
+	// Arrays in Go are stored contiguously and sequentially in memory,
+	// so we are able to directly access each item through indexing:
+	//
+	// 'base_address + (index * size_of_element)'.
+	//
+	// In each iteration, we take the pointer to the array data ('start')
+	// and add the (index * size_of_an_item) to get the address of each
+	// item along the block of memory. Finally, we cast the item to an
+	// 'unsafe.Pointer' and then into a '*string' to print it.
 	for i := 0; i < len(fruits); i++ {
 		p(*(*string)(unsafe.Add(start, uintptr(i)*size)))
 	}
@@ -50,7 +94,8 @@ func main() {
 	// bananas
 	// kansas
 
-	// ------------------------------------------------
+	// -------------------------------------------------------------------------
+
 	ps := priv.NewStruct()
 	p(ps) // {foo:bar bar:1337 baz:[100 150 200 250]}
 
