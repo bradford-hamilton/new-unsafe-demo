@@ -7,6 +7,8 @@ import (
 	"github.com/bradford-hamilton/new-unsafe-demo/internal/priv"
 )
 
+func p(a any) { fmt.Printf("%+v\n", a) }
+
 type user struct {
 	name    string
 	age     int
@@ -21,21 +23,22 @@ func main() {
 	*uNamePtr = "bradford"
 	p(u) // {name:bradford age:0 animals:[]}
 
-	age := (*int)(unsafe.Add(unsafe.Pointer(&u), unsafe.Offsetof(u.age)))
+	age := (*int)(unsafe.Pointer(
+		unsafe.Add(unsafe.Pointer(&u), unsafe.Offsetof(u.age)),
+	))
 	*age = 34
 	p(u) // {name:bradford age:34 animals:[]}
 
 	u.animals = []string{"missy", "ellie", "toby"}
-	secondAnimal := (*string)(unsafe.Add(
-		unsafe.Pointer(unsafe.SliceData(u.animals)),
-		unsafe.Sizeof(""),
+	secondAnimal := (*string)(unsafe.Pointer(
+		unsafe.Add(unsafe.Pointer(unsafe.SliceData(u.animals)), unsafe.Sizeof("")),
 	))
 	p(u) // {name:bradford age:34 animals:[missy ellie toby]}
 
 	*secondAnimal = "carlos"
 	p(u) // {name:bradford age:34 animals:[missy carlos toby]}
 
-	// ------------------------------------------------
+	// // ------------------------------------------------
 
 	fruits := []string{"apples", "oranges", "bananas", "kansas"}
 	start := unsafe.Pointer(unsafe.SliceData(fruits))
@@ -57,25 +60,23 @@ func main() {
 	*foo = "bradford"
 	p(ps) // {foo:bradford bar:1337 baz:[100 150 200 250]}
 
-	bar := (*int)(unsafe.Add(unsafe.Pointer(&ps), unsafe.Sizeof("")))
+	bar := (*int)(unsafe.Pointer(unsafe.Add(unsafe.Pointer(&ps), unsafe.Sizeof(""))))
 	*bar = 20
 	p(ps) // {foo:bradford bar:20 baz:[100 150 200 250]}
 
-	slcPtr := (*[]int)(unsafe.Add(
+	slcPtr := (*[]int)(unsafe.Pointer(unsafe.Add(
 		unsafe.Pointer(&ps), (unsafe.Sizeof("") + unsafe.Sizeof(int(0))),
-	))
+	)))
 	p(*slcPtr) // [100 150 200 250]
 
 	start = unsafe.Pointer(unsafe.SliceData(*slcPtr))
 	size = unsafe.Sizeof(int(0))
 
 	for i := 0; i < len(*slcPtr); i++ {
-		p(*(*int)(unsafe.Add(start, uintptr(i)*size)))
+		p(*(*int)(unsafe.Pointer(unsafe.Add(start, uintptr(i)*size))))
 	}
 	// 100
 	// 150
 	// 200
 	// 250
 }
-
-func p(a any) { fmt.Printf("%+v\n", a) }
