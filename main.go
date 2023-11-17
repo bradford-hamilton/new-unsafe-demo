@@ -45,7 +45,7 @@ func main() {
 	size := unsafe.Sizeof(fruits[0])
 
 	for i := 0; i < len(fruits); i++ {
-		p(*(*string)(unsafe.Add(start, uintptr(i)*size)))
+		p(*(*string)(unsafe.Pointer(unsafe.Add(start, uintptr(i)*size))))
 	}
 	// apples
 	// oranges
