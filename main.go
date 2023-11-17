@@ -38,7 +38,7 @@ func main() {
 	*secondAnimal = "carlos"
 	p(u) // {name:bradford age:34 animals:[missy carlos toby]}
 
-	// // ------------------------------------------------
+	// ------------------------------------------------
 
 	fruits := []string{"apples", "oranges", "bananas", "kansas"}
 	start := unsafe.Pointer(unsafe.SliceData(fruits))
