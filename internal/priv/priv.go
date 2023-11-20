@@ -6,7 +6,7 @@ type s struct {
 	baz []int
 }
 
-func NewStruct() s {
+func NewS() s {
 	return s{
 		foo: "bar",
 		bar: 1337,

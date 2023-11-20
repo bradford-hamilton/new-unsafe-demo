@@ -96,7 +96,7 @@ func main() {
 
 	// -------------------------------------------------------------------------
 
-	ps := priv.NewStruct()
+	ps := priv.NewS()
 	p(ps) // {foo:bar bar:1337 baz:[100 150 200 250]}
 
 	foo := (*string)(unsafe.Pointer(&ps))
