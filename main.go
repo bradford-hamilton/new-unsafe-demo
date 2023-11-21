@@ -96,6 +96,36 @@ func main() {
 
 	// -------------------------------------------------------------------------
 
+	// When converting between strings and byte slices in Go, the standard
+	// library's string() and []byte{} are commonly used for their safety and
+	// simplicity. These methods create a new copy of the data, ensuring that
+	// the original data remains immutable and that the type safety is
+	// maintained. However, this also means that every conversion involves
+	// memory allocation and copying, which can be a performance concern in
+	// certain high-efficiency scenarios.
+
+	// StringToByteSlice
+	myString := "neato burrito"
+	byteSlice := unsafe.Slice(unsafe.StringData(myString), len(myString))
+	p(byteSlice) // [110 101 97 116 111 32 98 117 114 114 105 116 111]
+
+	// ByteSliceToString
+	myBytes := []byte{
+		115, 111, 32, 109, 97, 110, 121, 32, 110,
+		101, 97, 116, 32, 98, 121, 116, 101, 115,
+	}
+	str := unsafe.String(unsafe.SliceData(myBytes), len(myBytes))
+	p(str) // so many neat bytes
+
+	// While unsafe provides a high-performance alternative for string-byte
+	// slice conversions, it should be used judiciously, primarily when
+	// profiling indicates that memory allocations in string conversions
+	// are a significant bottleneck. The benefits of using unsafe for
+	// these conversions must be weighed against the increased complexity
+	// and potential risks.
+
+	// -------------------------------------------------------------------------
+
 	ps := priv.NewS()
 	p(ps) // {foo:bar bar:1337 baz:[100 150 200 250]}
 
@@ -123,3 +153,21 @@ func main() {
 	// 200
 	// 250
 }
+
+// func main() {
+// 	// Allocate integer, get pointer to it:
+// 	x := 10
+// 	xPtr := &x
+
+// 	// Get a uintptr of the address of x:
+// 	xUintPtr := uintptr(unsafe.Pointer(xPtr))
+
+// 	// ---------------------------------------------------------------
+// 	// At this point, `x` is unused and so could be garbage collected.
+// 	// If that happens, we then have an uintptr (integer) that when
+// 	// casted back to an unsafe.Pointer, points to to some invalid
+// 	// piece of memory.
+// 	// ---------------------------------------------------------------
+
+// 	fmt.Println(*(*int)(unsafe.Pointer(xUintPtr))) // possible misuse of unsafe.Pointer
+// }
