@@ -1,1 +1,1 @@
-##### Demo repo for unsafe blog post
+##### Demo repo for [unsafe blog post](https://medium.com/@bradford_hamilton/exploring-unsafe-features-in-go-1-20-a-hands-on-demo-7149ba82e6e1)
