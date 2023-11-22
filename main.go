@@ -153,6 +153,7 @@ func main() {
 	// and potential risks.
 }
 
+// // Bad and Invalid Example:
 // func main() {
 // 	// Allocate integer, get pointer to it:
 // 	x := 10
