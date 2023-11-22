@@ -96,6 +96,34 @@ func main() {
 
 	// -------------------------------------------------------------------------
 
+	privUser := priv.NewUser()
+	p(privUser) // {name:admin age:50 animals:[roger barry melissa]}
+
+	name := (*string)(unsafe.Pointer(&privUser))
+	*name = "bradford"
+	p(privUser) // {name:bradford age:50 animals:[roger barry melissa]}
+
+	age = (*int)(unsafe.Add(unsafe.Pointer(&privUser), unsafe.Sizeof("")))
+	*age = 20
+	p(privUser) // {name:bradford age:20 animals:[roger barry melissa]}
+
+	slcPtr := (*[]string)(unsafe.Add(
+		unsafe.Pointer(&privUser), (unsafe.Sizeof("") + unsafe.Sizeof(int(0))),
+	))
+	p(*slcPtr) // [roger barry melissa]
+
+	start = unsafe.Pointer(unsafe.SliceData(*slcPtr))
+	size = unsafe.Sizeof("")
+
+	for i := 0; i < len(*slcPtr); i++ {
+		p(*(*string)(unsafe.Add(start, uintptr(i)*size)))
+	}
+	// roger
+	// barry
+	// melissa
+
+	// -------------------------------------------------------------------------
+
 	// When converting between strings and byte slices in Go, the standard
 	// library's string() and []byte{} are commonly used for their safety and
 	// simplicity. These methods create a new copy of the data, ensuring that
@@ -123,35 +151,6 @@ func main() {
 	// are a significant bottleneck. The benefits of using unsafe for
 	// these conversions must be weighed against the increased complexity
 	// and potential risks.
-
-	// -------------------------------------------------------------------------
-
-	ps := priv.NewS()
-	p(ps) // {foo:bar bar:1337 baz:[100 150 200 250]}
-
-	foo := (*string)(unsafe.Pointer(&ps))
-	*foo = "bradford"
-	p(ps) // {foo:bradford bar:1337 baz:[100 150 200 250]}
-
-	bar := (*int)(unsafe.Add(unsafe.Pointer(&ps), unsafe.Sizeof("")))
-	*bar = 20
-	p(ps) // {foo:bradford bar:20 baz:[100 150 200 250]}
-
-	slcPtr := (*[]int)(unsafe.Add(
-		unsafe.Pointer(&ps), (unsafe.Sizeof("") + unsafe.Sizeof(int(0))),
-	))
-	p(*slcPtr) // [100 150 200 250]
-
-	start = unsafe.Pointer(unsafe.SliceData(*slcPtr))
-	size = unsafe.Sizeof(int(0))
-
-	for i := 0; i < len(*slcPtr); i++ {
-		p(*(*int)(unsafe.Add(start, uintptr(i)*size)))
-	}
-	// 100
-	// 150
-	// 200
-	// 250
 }
 
 // func main() {
