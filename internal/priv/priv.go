@@ -1,15 +1,15 @@
 package priv
 
-type s struct {
-	foo string
-	bar int
-	baz []int
+type user struct {
+	name    string
+	age     int
+	animals []string
 }
 
-func NewS() s {
-	return s{
-		foo: "bar",
-		bar: 1337,
-		baz: []int{100, 150, 200, 250},
+func NewUser() user {
+	return user{
+		name:    "admin",
+		age:     50,
+		animals: []string{"roger", "barry", "melissa"},
 	}
 }
